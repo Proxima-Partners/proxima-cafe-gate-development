@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gate Test — Proxima Cafe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Noto+Serif+Display:wght@300;400;700&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #f8efe3;
+      --blue-light: #d9e8ff;
+      --accent: #4d65ff;
+      --dark: #121212;
+      --mid: #555;
+      --light: #999;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--dark);
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: var(--cream);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-logo { font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 28px; list-style: none; font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 500; }
+    .nav-links a { text-decoration: none; color: var(--dark); }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; font-family: 'Inter Tight', sans-serif; }
+
+    /* ── Article ── */
+    .article-wrap { max-width: 700px; margin: 56px auto; padding: 0 24px; }
+    .article-tag { display: inline-block; font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .article-title { font-family: 'Noto Serif Display', serif; font-size: 38px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .article-subtitle { font-family: 'Nunito Sans', sans-serif; font-size: 18px; font-weight: 300; color: var(--mid); margin-bottom: 24px; line-height: 1.5; }
+    .article-byline { display: flex; align-items: center; gap: 10px; font-family: 'Inter Tight', sans-serif; font-size: 13px; color: var(--mid); padding: 16px 0; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); margin-bottom: 32px; }
+    .article-body p { margin-bottom: 20px; font-size: 17px; line-height: 1.75; }
+
+    /* main-content hidden until script runs */
+    [data-ms-gated] { display: none; }
+
+    /* field labels — test only */
+    .field-label { display: inline-block; font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: var(--accent); padding: 2px 8px; border-radius: 3px; margin-bottom: 12px; }
+
+    /* ── Mock modal ── */
+    #ms-mock-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+    }
+    #ms-mock-modal.open { display: flex; }
+    .ms-mock-modal-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 40px 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Inter Tight', sans-serif;
+    }
+    .ms-mock-modal-box h3 { font-family: 'Noto Serif Display', serif; font-size: 22px; margin-bottom: 8px; }
+    .ms-mock-modal-box p { font-size: 14px; color: var(--mid); margin-bottom: 24px; }
+    .ms-mock-modal-box button {
+      padding: 12px 24px;
+      background: var(--dark);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: 'Inter Tight', sans-serif;
+      cursor: pointer;
+    }
+
+    /* ── Test controls ── */
+    #controls { position: fixed; top: 16px; right: 16px; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; font-family: 'Inter Tight', sans-serif; font-size: 13px; z-index: 9999; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    #controls strong { display: block; margin-bottom: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--light); }
+    #controls button { display: block; width: 100%; margin-bottom: 6px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; font-family: 'Inter Tight', sans-serif; text-align: left; }
+    #controls button:hover { background: var(--cream); }
+    #controls button.active { background: var(--dark); color: #fff; border-color: var(--dark); }
+  </style>
+</head>
+<body>
+
+  <!-- Mock Memberstack modal -->
+  <div id="ms-mock-modal">
+    <div class="ms-mock-modal-box">
+      <h3 id="ms-mock-modal-title">Sign up</h3>
+      <p id="ms-mock-modal-desc">This is where the Memberstack modal would appear.</p>
+      <button onclick="document.getElementById('ms-mock-modal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-logo">Proxima Cafe</div>
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Articles</a></li>
+      <li><a href="#">Posts</a></li>
+      <li><a href="#">Profile</a></li>
+    </ul>
+    <div class="nav-avatar">ME</div>
+  </nav>
+
+  <div id="controls">
+    <strong>Test as</strong>
+    <button id="btn-guest" class="active" onclick="setMode('guest')">Guest (not logged in)</button>
+    <button id="btn-member" onclick="setMode('member')">Member (with plan)</button>
+    <button id="btn-noaccess" onclick="setMode('noaccess')">Member (no plan)</button>
+  </div>
+
+  <div class="article-wrap">
+    <span class="article-tag">Spirituality</span>
+    <h1 class="article-title">What My Friend Already Knew and Somehow Missed</h1>
+    <p class="article-subtitle">He had real faith — he just didn't know what to look for. A conversation in San Francisco about the perspective that changes how you see everything.</p>
+    <div class="article-byline">
+      <span>Mike Edwards &nbsp;·&nbsp; Proxima &nbsp;·&nbsp; Program Director</span>
+      <span style="margin-left:auto">March 24, 2026</span>
+    </div>
+
+    <div class="article-body">
+
+      <!-- post-content-members-only: always visible -->
+      <p>
+        We were somewhere in the middle of a long conversation when my new friend said something that stayed with me.
+        He'd been following Jesus for years. He had good theology, a real relationship, genuine faith. But nobody had
+        ever handed him a perspective for watching God work in ordinary life. He hadn't known that was something you could do.
+      </p>
+
+      <!-- main-content: gated (data-ms-gated bound to member-only switch) -->
+      <div data-ms-gated="true">
+        <p>I didn't grow up with that perspective either. Someone had to give it to me.</p>
+        <p>
+          There's a moment in Acts where Paul arrives in Ephesus and meets a small group of believers who are sincere
+          but incomplete. They know the beginning of the story. What they're missing is what came next — the Spirit,
+          present and active, not as a doctrine to affirm but as a relationship to live inside. N.T. Wright reads it
+          this way: Luke isn't just introducing Paul's work in Ephesus. He's showing that from the very start, Paul
+          was concerned with the Spirit's actual work — in individual lives, and out into the wider community.
+        </p>
+        <p>That gap — between knowing about something and having a perspective that makes it visible — is what my friend was sitting in.</p>
+        <p>
+          He's not unusual. Most people I talk with in San Francisco who follow Jesus can name their faith clearly.
+          What's harder to name is where Jesus shows up on a Tuesday. In a stranger's unexpected kindness. In the
+          conversation that goes somewhere you didn't plan. In the thing that stirs in you before you've had time to think about it.
+        </p>
+        <p>"He will guide you into all truth," Jesus says of the Spirit in John 16. Not explain. Not inform. Guide — present, directional, ongoing.</p>
+        <p>My friend had never been given that perspective. So he hadn't looked.</p>
+        <p>
+          What shifted in our conversation wasn't a new piece of theology. It was closer to a new perspective. A way
+          of seeing he hadn't been handed before. Once you know the kingdom of God is moving around you, ordinary
+          moments stop being background noise. The conversation that goes somewhere unexpected. The pull toward a
+          stranger. The thing that stirs in you before you've had time to explain it. These become something worth
+          paying attention to.
+        </p>
+        <p>I left without knowing if any of it landed. That's usually how it goes.</p>
+        <p>
+          But I've been thinking about what it costs to go years with genuine faith and never have someone say:
+          the kingdom of God is already moving around you. You're allowed to look for it.
+        </p>
+        <p>What would change for you if that were the perspective you carried into tomorrow?</p>
+        <p>Perhaps not everything. But perhaps enough.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    var PLAN_ID = 'pln_member-5l7v0yls';
+    var currentMode = 'guest';
+
+    var mockMembers = {
+      guest: null,
+      member: {
+        id: 'mem_test123',
+        auth: { email: 'edwardsme7@gmail.com' },
+        planConnections: [{ planId: PLAN_ID, active: true }]
+      },
+      noaccess: {
+        id: 'mem_test456',
+        auth: { email: 'other@example.com' },
+        planConnections: []
+      }
+    };
+
+    window.$memberstackDom = {
+      getCurrentMember: function () {
+        return Promise.resolve({ data: mockMembers[currentMode] });
+      },
+      openModal: function (type, opts) {
+        var modal = document.getElementById('ms-mock-modal');
+        var title = document.getElementById('ms-mock-modal-title');
+        var desc  = document.getElementById('ms-mock-modal-desc');
+        if (type === 'signup') {
+          title.textContent = 'Create your account';
+          desc.textContent  = opts && opts.email ? 'Signing up as: ' + opts.email : 'Memberstack signup modal';
+        } else {
+          title.textContent = 'Log in';
+          desc.textContent  = 'Memberstack login modal';
+        }
+        modal.classList.add('open');
+      }
+    };
+
+    function resetGate() {
+      document.querySelectorAll('[data-ms-gated]').forEach(function (el) {
+        el.style.display   = 'none';
+        el.style.maxHeight = '';
+        el.style.overflow  = '';
+        el.style.position  = '';
+      });
+      document.querySelectorAll('.ms-gate-fade, .ms-gate-panel').forEach(function (el) {
+        el.remove();
+      });
+      // restore subtitle
+      document.querySelectorAll('.article-subtitle').forEach(function (el) {
+        el.style.display = '';
+      });
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      resetGate();
+      document.querySelectorAll('#controls button').forEach(function (b) { b.classList.remove('active'); });
+      document.getElementById('btn-' + mode).classList.add('active');
+      runGate();
+    }
+
+    function runGate() {
+      window.$memberstackDom.getCurrentMember().then(function (res) {
+        var member = res.data;
+        if (!member) { handleGuest(); return; }
+        var hasPlan = (member.planConnections || []).map(function (p) { return p.planId; }).includes(PLAN_ID);
+        hasPlan ? handleMemberWithAccess() : handleMemberWithoutAccess();
+      });
+    }
+
+    function handleGuest() {
+      document.querySelectorAll('[data-ms-gated="true"]').forEach(gateElement);
+    }
+
+    function handleMemberWithAccess() {
+      // Show full article, hide preview excerpt
+      document.querySelectorAll('[data-ms-gated="true"]').forEach(function (el) {
+        el.style.display   = 'block';
+        el.style.maxHeight = '';
+        el.style.overflow  = '';
+      });
+      document.querySelectorAll('.article-subtitle').forEach(function (el) {
+        el.style.display = 'none';
+      });
+    }
+
+    function handleMemberWithoutAccess() {
+      document.querySelectorAll('[data-ms-gated="true"]').forEach(gateElement);
+    }
+
+    function gateElement(el) {
+      el.style.display   = 'block';
+      el.style.maxHeight = '160px';
+      el.style.overflow  = 'hidden';
+      el.style.position  = 'relative';
+      var fade = document.createElement('div');
+      fade.className = 'ms-gate-fade';
+      el.appendChild(fade);
+      el.parentNode.insertBefore(buildGatePanel(), el.nextSibling);
+    }
+
+    function buildGatePanel() {
+      var panel = document.createElement('div');
+      panel.className = 'ms-gate-panel';
+      panel.innerHTML =
+        '<h2>Create a free account, or log in.</h2>' +
+        '<p>Become a member to access exclusive content, updates and more.</p>' +
+        '<div class="ms-gate-input-wrap">' +
+          '<label for="ms-gate-email">Email address</label>' +
+          '<input id="ms-gate-email" class="ms-gate-input" type="email" />' +
+        '</div>' +
+        '<button class="ms-gate-btn" id="ms-gate-continue">Continue</button>' +
+        '<div class="ms-gate-or">or</div>' +
+        '<button class="ms-gate-login" id="ms-gate-login">Log in</button>';
+      panel.querySelector('#ms-gate-continue').addEventListener('click', function () {
+        var email = panel.querySelector('#ms-gate-email').value;
+        window.$memberstackDom.openModal('signup', { email: email });
+      });
+      panel.querySelector('#ms-gate-login').addEventListener('click', function () {
+        window.$memberstackDom.openModal('login');
+      });
+      return panel;
+    }
+
+    // Run on load
+    document.addEventListener('DOMContentLoaded', runGate);
+  </script>
+
+  <style>
+    .ms-gate-fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 280px;
+      background: linear-gradient(to bottom, rgba(248,239,227,0) 0%, rgba(248,239,227,0.7) 35%, #f8efe3 70%);
+      pointer-events: none;
+    }
+    @keyframes ms-slide-up {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .ms-gate-panel {
+      background: #f8efe3;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding: 40px 24px 56px;
+      text-align: center;
+      font-family: 'Nunito Sans', sans-serif;
+      animation: ms-slide-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .ms-gate-panel h2 { font-family: 'Noto Serif Display', serif; font-size: 26px; font-weight: 700; color: #121212; margin: 0 0 12px; line-height: 1.3; }
+    .ms-gate-panel p { font-size: 15px; color: #555; margin: 0 0 24px; max-width: 420px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+    .ms-gate-input-wrap { max-width: 420px; margin: 0 auto 12px; text-align: left; }
+    .ms-gate-input-wrap label { display: block; font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; font-family: 'Inter Tight', sans-serif; }
+    .ms-gate-input { width: 100%; padding: 12px 14px; font-size: 15px; border: 1px solid #bbb; border-radius: 4px; outline: none; box-sizing: border-box; background: #fff; color: #121212; font-family: 'Nunito Sans', sans-serif; }
+    .ms-gate-input:focus { border-color: #4d65ff; }
+    .ms-gate-btn { display: block; width: 100%; max-width: 420px; margin: 0 auto 16px; padding: 14px; background: #121212; color: #fff; font-size: 15px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; font-family: 'Inter Tight', sans-serif; }
+    .ms-gate-btn:hover { background: #333; }
+    .ms-gate-or { font-size: 13px; color: #999; margin-bottom: 14px; font-family: 'Inter Tight', sans-serif; }
+    .ms-gate-login { font-size: 14px; color: #121212; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: 'Inter Tight', sans-serif; }
+    .ms-gate-login:hover { color: #4d65ff; }
+  </style>
+
+</body>
+</html>

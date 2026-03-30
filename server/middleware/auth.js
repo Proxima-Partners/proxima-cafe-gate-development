@@ -9,9 +9,9 @@ async function verifyMember(req, res, next) {
   }
 
   try {
-    const response = await axios.get('https://api.memberstack.com/v1/members/me', {
+    const response = await axios.get('https://admin.memberstack.com/members/currentMember', {
       headers: {
-        'x-memberstack-token': token,
+        'Authorization': `Bearer ${token}`,
         'x-api-key': process.env.MEMBERSTACK_SECRET_KEY,
       },
     });

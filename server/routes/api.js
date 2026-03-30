@@ -3,7 +3,7 @@ const axios = require('axios');
 const router = express.Router();
 const { verifyMember } = require('../middleware/auth');
 
-const MS_API = 'https://api.memberstack.com/v1';
+const MS_API = 'https://admin.memberstack.com';
 const headers = () => ({
   'x-api-key': process.env.MEMBERSTACK_SECRET_KEY,
 });
