@@ -1,0 +1,7 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "review/preserve-lockfile-20261113": false
+    }
+  }
+}
